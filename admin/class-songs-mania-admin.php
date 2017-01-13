@@ -100,4 +100,50 @@ class Songs_Mania_Admin {
 
 	}
 
+    /**
+     * Register `song` post_type
+     *
+     * @link https://developer.wordpress.org/reference/functions/register_post_type/
+     *
+     * @since    1.0.0
+     */
+    public function register_post_type() {
+
+        $args = array(
+            'label'                 => __( 'Songs', 'vk_base' ),
+            'public'                => true,
+            'publicly_queryable'    => true,
+            'show_ui'               => true,
+            'show_in_menu'          => true,
+            'query_var'             => true,
+            'rewrite'               => array( 'slug' => 'song' ),
+            'capability_type'       => 'post',
+            'has_archive'           => true,
+            'taxonomies'            => array( 'category' ),
+            'hierarchical'          => false,
+            'menu_position'         => null,
+            'supports'              => array( 'title', 'editor', 'category', 'author', 'thumbnail', 'excerpt', 'comments' ),
+        );
+
+        register_post_type( 'song', $args );
+    }
+
+    /**
+     * Register `Song Manager` role
+     *
+     * @link https://developer.wordpress.org/reference/functions/register_post_type/
+     *
+     * @since    1.0.0
+     */
+    public function register_role() {
+
+        wpcom_vip_add_role( 'song_manager', 'Song Manager', array(
+            'read' => true,
+            'edit_posts' => true,
+            'edit_others_posts' => true,
+            'edit_published_posts' => true,
+            'read_private_posts' => true,
+        ) );
+    }
+
 }
