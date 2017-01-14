@@ -9,7 +9,7 @@
  * @since      1.0.0
  *
  * @package    Songs_Mania
- * @subpackage Songs_Mania/admin/partials
+ * @subpackage Songs_Mania/admin/templates
  */
 ?>
 

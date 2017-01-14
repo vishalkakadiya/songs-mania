@@ -159,6 +159,10 @@ class Songs_Mania {
 
         $this->loader->add_action( 'init', $plugin_admin, 'register_role' );
 
+        $this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'register_meta_boxes' );
+
+        $this->loader->add_action( 'save_post', $plugin_admin, 'save_meta', 10, 2 );
+
 	}
 
 	/**
