@@ -176,7 +176,7 @@ class Songs_Mania_Admin {
         $viewers = get_post_meta( $post->ID, 'sm_song_viewer', true );
 
         $file = 'templates/songs-meta-fields.php';
-        include_once( $file ); // Check with validate_file();
+        include_once( $file );
 //        if ( validate_file( $file ) ) {
 //            include_once( $file );
 //        }
@@ -190,30 +190,29 @@ class Songs_Mania_Admin {
      * @since    1.0.0
      *
      * @param int     $post_id Post ID.
-     * @param WP_Post $post    Post object.
      * @return null
      */
-    public function save_meta( $post_id, $post ) {
+    public function save_meta( $post_id ) {
         // Add nonce for security and authentication.
-        $nonce_name   = isset( $_POST['sm_nonce'] ) ? $_POST['sm_nonce'] : '';
+        $nonce_name   = isset( $_POST['sm_nonce'] ) ? $_POST['sm_nonce'] : ''; // Input var okay.
         $nonce_action = 'sm_song_action';
 
         // Check if nonce is set.
         if ( ! isset( $nonce_name ) ) {
+
+            // Check if nonce is valid.
+            if ( ! wp_verify_nonce( $nonce_name, $nonce_action ) ) {
+                return;
+            }
+
+            // Check if user has permissions to save data.
+            if ( ! current_user_can( 'edit_post', $post_id ) ) {
+                return;
+            }
+
+            // Check if not an autosave.
             return;
         }
-
-        // Check if nonce is valid.
-        if ( ! wp_verify_nonce( $nonce_name, $nonce_action ) ) {
-            return;
-        }
-
-        // Check if user has permissions to save data.
-        if ( ! current_user_can( 'edit_post', $post_id ) ) {
-            return;
-        }
-
-        // Check if not an autosave.
         if ( wp_is_post_autosave( $post_id ) ) {
             return;
         }

@@ -161,7 +161,7 @@ class Songs_Mania {
 
         $this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'register_meta_boxes' );
 
-        $this->loader->add_action( 'save_post', $plugin_admin, 'save_meta', 10, 2 );
+        $this->loader->add_action( 'save_post', $plugin_admin, 'save_meta', 10, 1 );
 
 	}
 
@@ -177,7 +177,14 @@ class Songs_Mania {
 		$plugin_public = new Songs_Mania_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
+
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+        $this->loader->add_action( 'save_post', $plugin_public, 'refresh_songs_cache', 10, 1 );
+
+        $this->loader->add_action( 'delete_post', $plugin_public, 'refresh_songs_cache', 10, 1 );
+
+        $this->loader->add_shortcode( 'sm_display_songs', $plugin_public, 'display_songs' );
 
 	}
 
