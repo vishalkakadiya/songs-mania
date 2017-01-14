@@ -248,8 +248,8 @@ class Songs_Mania_Admin {
 
         $viewer = 0;
         if ( isset( $_POST['sm_song_viewer'] ) && ! empty( $_POST['sm_song_viewer'] ) ) {
-            $safe_song_likes = intval( $_POST['sm_song_viewer'] );
-            if ( $safe_song_likes ) {
+            $sm_song_viewer = intval( $_POST['sm_song_viewer'] );
+            if ( $sm_song_viewer ) {
                 $viewer = $_POST['sm_song_viewer'];
             }
         }
