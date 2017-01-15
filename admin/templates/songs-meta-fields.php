@@ -20,36 +20,36 @@
 ?>
 
 <table>
-    <tr>
-        <td>
-            <label class="sm-meta-label" for="sm-singer"><?php esc_html_e( 'Singer : ', 'songs-mania' );?></label>
-        </td>
-        <td>
-            <input type="text" id="sm-singer" name="sm_song_singer" value="<?php echo esc_attr( $singer );?>" class="sm-meta-field" />
-        </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="sm-meta-label" for="sm-singer-email"><?php esc_html_e( 'Singer email : ', 'songs-mania' );?></label>
-            </td>
-            <td>
-                <input type="email" id="sm-singer-email" name="sm_song_singer_email" value="<?php echo esc_attr( $singer_email );?>" class="sm-meta-field" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="sm-meta-label" for="sm-song-likes"><?php esc_html_e( 'Song Likes : ', 'songs-mania' );?></label>
-            </td>
-            <td>
-                <input type="number" id="sm-song-likes" name="sm_song_likes" value="<?php echo esc_attr( $likes );?>" class="sm-meta-field" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="sm-meta-label" for="sm-song-viewer"><?php esc_html_e( 'Song Viewer', 'songs-mania' );?></label>
-            </td>
-            <td>
-                <input type="number" id="sm-song-viewer" name="sm_song_viewer" value="<?php echo esc_attr( $viewers );?>" class="sm-meta-field" />
-            </td>
-        </tr>
+	<tr>
+		<td>
+			<label class="sm-meta-label" for="sm-singer"><?php esc_html_e( 'Singer : ', 'songs-mania' );?></label>
+		</td>
+		<td>
+			<input type="text" id="sm-singer" name="sm_song_singer" value="<?php echo esc_attr( $singer );?>" class="sm-meta-field" />
+		</td>
+		</tr>
+		<tr>
+			<td>
+				<label class="sm-meta-label" for="sm-singer-email"><?php esc_html_e( 'Singer email : ', 'songs-mania' );?></label>
+			</td>
+			<td>
+				<input type="email" id="sm-singer-email" name="sm_song_singer_email" value="<?php echo esc_attr( $singer_email );?>" class="sm-meta-field" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label class="sm-meta-label" for="sm-song-likes"><?php esc_html_e( 'Song Likes : ', 'songs-mania' );?></label>
+			</td>
+			<td>
+				<input type="number" id="sm-song-likes" name="sm_song_likes" value="<?php echo esc_attr( $likes );?>" class="sm-meta-field" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label class="sm-meta-label" for="sm-song-viewer"><?php esc_html_e( 'Song Viewer', 'songs-mania' );?></label>
+			</td>
+			<td>
+				<input type="number" id="sm-song-viewer" name="sm_song_viewer" value="<?php echo esc_attr( $viewers );?>" class="sm-meta-field" />
+			</td>
+		</tr>
 </table>

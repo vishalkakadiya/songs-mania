@@ -1,32 +1,41 @@
-(function( $ ) {
-	'use strict';
+(function( $, wp ) {
+    'use strict';
 
-	/**
-	 * All of the code for your public-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
+    var nonce = smSongLikeNonce;
 
-})( jQuery );
+    window.songsObj = {
+
+        // function when like button clicked
+        likeSong: function ( postId ) {
+            var params = {
+                sm_nonce: smSongLikeNonce,
+                post_id: postId
+            };
+
+            // Ajax request to create account
+            var request = wp.ajax.post( 'sm_like_song', params );
+
+            // Check ajax response
+            request.done( function( data ) {
+                // data.likes_count
+                $( '.sm-likes-' + postId ).text( data.likes_count );
+            }, 'json' );
+
+            request.fail( function( data ) {
+                console.log('===  Error ====');
+                console.log(data);
+            } );
+
+            request.always( function( data ) {
+                console.log('===  Always ====');
+                console.log(data);
+            } );
+        },
+    };
+
+    $( '.sm-like' ).on( 'click', function () {
+        var postId = $( this ).data( "id" );
+        songsObj.likeSong( postId );
+    } );
+
+})( jQuery, window.wp );

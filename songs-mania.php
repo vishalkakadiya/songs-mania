@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The plugin bootstrap file
  *
@@ -48,9 +47,8 @@ function deactivate_songs_mania() {
 	Songs_Mania_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_songs_mania' );
-register_deactivation_hook( __FILE__, 'deactivate_songs_mania' );
-
+// register_activation_hook( __FILE__, 'activate_songs_mania' );
+// register_deactivation_hook( __FILE__, 'deactivate_songs_mania' );
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
@@ -73,4 +71,3 @@ function run_songs_mania() {
 
 }
 run_songs_mania();
-

@@ -44,8 +44,8 @@ class Songs_Mania_Admin {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @param      string $plugin_name       The name of this plugin.
+	 * @param      string $version    The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -100,160 +100,151 @@ class Songs_Mania_Admin {
 
 	}
 
-    /**
-     * Register `song` post_type
-     *
-     * @link https://developer.wordpress.org/reference/functions/register_post_type/
-     *
-     * @since    1.0.0
-     */
-    public function register_post_type() {
+	/**
+	 * Register `song` post_type
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/register_post_type/
+	 *
+	 * @since    1.0.0
+	 */
+	public function register_post_type() {
 
-        $args = array(
-            'label'                 => __( 'Songs', 'songs-mania' ),
-            'public'                => true,
-            'publicly_queryable'    => true,
-            'show_ui'               => true,
-            'show_in_menu'          => true,
-            'query_var'             => true,
-            'rewrite'               => array( 'slug' => 'song' ),
-            'capability_type'       => 'post',
-            'has_archive'           => true,
-            'taxonomies'            => array( 'category' ),
-            'hierarchical'          => false,
-            'menu_position'         => null,
-            'supports'              => array( 'title', 'editor', 'category', 'author', 'thumbnail', 'excerpt', 'comments' ),
-        );
+		$args = array(
+			'label'                 => __( 'Songs', 'songs-mania' ),
+			'public'                => true,
+			'publicly_queryable'    => true,
+			'show_ui'               => true,
+			'show_in_menu'          => true,
+			'query_var'             => true,
+			'rewrite'               => array( 'slug' => 'song' ),
+			'capability_type'       => 'post',
+			'has_archive'           => true,
+			'taxonomies'            => array( 'category' ),
+			'hierarchical'          => false,
+			'menu_position'         => null,
+			'supports'              => array( 'title', 'editor', 'category', 'author', 'thumbnail', 'excerpt', 'comments' ),
+		);
 
-        register_post_type( 'song', $args );
-    }
+		register_post_type( 'song', $args );
+	}
 
-    /**
-     * Register `Song Manager` role
-     *
-     * @link https://developer.wordpress.org/reference/functions/register_post_type/
-     *
-     * @since    1.0.0
-     */
-    public function register_role() {
+	/**
+	 * Register `Song Manager` role
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/register_post_type/
+	 *
+	 * @since    1.0.0
+	 */
+	public function register_role() {
 
-        wpcom_vip_add_role( 'song_manager', 'Song Manager', array(
-            'read' => true,
-            'edit_posts' => true,
-            'edit_others_posts' => true,
-            'edit_published_posts' => true,
-            'read_private_posts' => true,
-        ) );
-    }
+		wpcom_vip_add_role( 'song_manager', 'Song Manager', array(
+			'read' => true,
+			'edit_posts' => true,
+			'edit_others_posts' => true,
+			'edit_published_posts' => true,
+			'read_private_posts' => true,
+		) );
+	}
 
-    /**
-     * Add
-     *
-     * @link https://developer.wordpress.org/reference/functions/add_meta_box/
-     *
-     * @since    1.0.0
-     */
-    function register_meta_boxes() {
-        add_meta_box( 'vk-song-meta', __( 'Song\'s Detail', 'songs-mania' ), array( $this, 'render_metabox' ), 'song', 'normal', 'default' );
-    }
+	/**
+	 * Add
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
+	 *
+	 * @since    1.0.0
+	 */
+	function register_meta_boxes() {
+		add_meta_box( 'sm-song-meta', __( 'Song\'s Detail', 'songs-mania' ), array( $this, 'render_metabox' ), 'song', 'normal', 'default' );
+	}
 
+	/**
+	 * Renders the meta box.
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
+	 *
+	 * @since    1.0.0
+	 */
+	function render_metabox() {
+		global $post;
 
-    /**
-     * Renders the meta box.
-     *
-     * @link https://developer.wordpress.org/reference/functions/add_meta_box/
-     *
-     * @since    1.0.0
-     */
-    function render_metabox() {
-        global $post;
+		// Noncename needed to verify where the data originated.
+		wp_nonce_field( 'sm_song_action', 'sm_nonce' );
+		$singer = get_post_meta( $post->ID, 'sm_song_singer', true );
+		$singer_email = get_post_meta( $post->ID, 'sm_song_singer_email', true );
+		$likes = get_post_meta( $post->ID, 'sm_song_likes', true );
+		$viewers = get_post_meta( $post->ID, 'sm_song_viewer', true );
 
-        // Noncename needed to verify where the data originated
-        wp_nonce_field( 'sm_song_action', 'sm_nonce' );
-        $singer = get_post_meta( $post->ID, 'sm_song_singer', true );
-        $singer_email = get_post_meta( $post->ID, 'sm_song_singer_email', true );
-        $likes = get_post_meta( $post->ID, 'sm_song_likes', true );
-        $viewers = get_post_meta( $post->ID, 'sm_song_viewer', true );
+		require_once( plugin_dir_path( __FILE__ ) . '/templates/songs-meta-fields.php' );
+	}
 
-        $file = 'templates/songs-meta-fields.php';
-        include_once( $file );
-//        if ( validate_file( $file ) ) {
-//            include_once( $file );
-//        }
-    }
+	/**
+	 * Handles saving the meta box.
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
+	 *
+	 * @since    1.0.0
+	 *
+	 * @param int $post_id Post ID.
+	 * @return null
+	 */
+	public function save_meta( $post_id ) {
+		// Add nonce for security and authentication.
+		$sm_nonce = filter_input( INPUT_POST, 'sm_nonce', FILTER_SANITIZE_STRING );
+		$nonce_name = isset( $sm_nonce ) ? $sm_nonce : '';
+		$nonce_action = 'sm_song_action';
 
-    /**
-     * Handles saving the meta box.
-     *
-     * @link https://developer.wordpress.org/reference/functions/add_meta_box/
-     *
-     * @since    1.0.0
-     *
-     * @param int     $post_id Post ID.
-     * @return null
-     */
-    public function save_meta( $post_id ) {
-        // Add nonce for security and authentication.
-        $nonce_name   = isset( $_POST['sm_nonce'] ) ? $_POST['sm_nonce'] : ''; // Input var okay.
-        $nonce_action = 'sm_song_action';
+		// Check if nonce is set.
+		if ( ! isset( $nonce_name ) ) {
 
-        // Check if nonce is set.
-        if ( ! isset( $nonce_name ) ) {
+			// Check if nonce is valid.
+			if ( ! wp_verify_nonce( $nonce_name, $nonce_action ) ) {
+				return;
+			}
 
-            // Check if nonce is valid.
-            if ( ! wp_verify_nonce( $nonce_name, $nonce_action ) ) {
-                return;
-            }
+			// Check if user has permissions to save data.
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				return;
+			}
 
-            // Check if user has permissions to save data.
-            if ( ! current_user_can( 'edit_post', $post_id ) ) {
-                return;
-            }
+			// Check if not an autosave.
+			return;
+		}
+		if ( wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
 
-            // Check if not an autosave.
-            return;
-        }
-        if ( wp_is_post_autosave( $post_id ) ) {
-            return;
-        }
+		// Check if not a revision.
+		if ( wp_is_post_revision( $post_id ) ) {
+			return;
+		}
 
-        // Check if not a revision.
-        if ( wp_is_post_revision( $post_id ) ) {
-            return;
-        }
+		$singer = '';
+		$sm_song_singer = filter_input( INPUT_POST, 'sm_song_singer', FILTER_SANITIZE_STRING );
+		if ( isset( $sm_song_singer ) ) {
+			$singer = sanitize_text_field( $sm_song_singer );
+		}
+		update_post_meta( $post_id, 'sm_song_singer', $singer );
 
-        $singer = '';
-        if ( isset( $_POST['sm_song_singer'] ) && ! empty( $_POST['sm_song_singer'] ) ) {
-            $singer = sanitize_text_field( $_POST['sm_song_singer'] );
-        }
-        update_post_meta( $post_id, 'sm_song_singer', $singer );
+		$singer_email = '';
+		$sm_song_singer_email = filter_input( INPUT_POST, 'sm_song_singer_email', FILTER_VALIDATE_EMAIL );
+		if ( isset( $sm_song_singer_email ) ) {
+			$singer_email = sanitize_email( $sm_song_singer_email );
+		}
+		update_post_meta( $post_id, 'sm_song_singer_email', $singer_email );
 
-        $singer_email = '';
-        if ( isset( $_POST['sm_song_singer_email'] ) && ! empty( $_POST['sm_song_singer_email'] ) ) {
-            if ( is_email( $_POST['sm_song_singer_email'] ) ) {
-                $singer_email = sanitize_email( $_POST['sm_song_singer_email'] );
-            }
-        }
-        update_post_meta( $post_id, 'sm_song_singer_email', $singer_email );
+		$likes = 0;
+		$sm_song_likes = filter_input( INPUT_POST, 'sm_song_likes', FILTER_VALIDATE_INT );
+		if ( ! empty( $sm_song_likes ) ) {
+			$likes = $sm_song_likes;
+		}
+		update_post_meta( $post_id, 'sm_song_likes', $likes );
 
-        $likes = 0;
-        if ( isset( $_POST['sm_song_likes'] ) && ! empty( $_POST['sm_song_likes'] ) ) {
-            $safe_song_likes = intval( $_POST['sm_song_likes'] );
-            if ( $safe_song_likes ) {
-                $likes = $_POST['sm_song_likes'];
-            }
-        }
-        update_post_meta( $post_id, 'sm_song_likes', $likes );
-
-        $viewer = 0;
-        if ( isset( $_POST['sm_song_viewer'] ) && ! empty( $_POST['sm_song_viewer'] ) ) {
-            $sm_song_viewer = intval( $_POST['sm_song_viewer'] );
-            if ( $sm_song_viewer ) {
-                $viewer = $_POST['sm_song_viewer'];
-            }
-        }
-        update_post_meta( $post_id, 'sm_song_viewer', $viewer );
-
-    }
+		$viewer = 0;
+		$sm_song_viewer = filter_input( INPUT_POST, 'sm_song_viewer', FILTER_VALIDATE_INT );
+		if ( ! empty( $sm_song_viewer ) ) {
+			$viewer = $sm_song_viewer;
+		}
+		update_post_meta( $post_id, 'sm_song_viewer', $viewer );
+	}
 
 }

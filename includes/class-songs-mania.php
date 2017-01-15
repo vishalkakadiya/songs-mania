@@ -157,11 +157,11 @@ class Songs_Mania {
 
 		$this->loader->add_action( 'init', $plugin_admin, 'register_post_type' );
 
-        $this->loader->add_action( 'init', $plugin_admin, 'register_role' );
+		$this->loader->add_action( 'init', $plugin_admin, 'register_role' );
 
-        $this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'register_meta_boxes' );
+		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'register_meta_boxes' );
 
-        $this->loader->add_action( 'save_post', $plugin_admin, 'save_meta', 10, 1 );
+		$this->loader->add_action( 'save_post', $plugin_admin, 'save_meta', 10, 1 );
 
 	}
 
@@ -180,11 +180,15 @@ class Songs_Mania {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-        $this->loader->add_action( 'save_post', $plugin_public, 'refresh_songs_cache', 10, 1 );
+		$this->loader->add_action( 'save_post', $plugin_public, 'refresh_songs_cache', 10, 1 );
 
-        $this->loader->add_action( 'delete_post', $plugin_public, 'refresh_songs_cache', 10, 1 );
+		$this->loader->add_action( 'delete_post', $plugin_public, 'refresh_songs_cache', 10, 1 );
 
-        $this->loader->add_shortcode( 'sm_display_songs', $plugin_public, 'display_songs' );
+		$this->loader->add_shortcode( 'sm_display_songs', $plugin_public, 'display_songs' );
+
+		$this->loader->add_action( 'wp_ajax_sm_like_song', $plugin_public, 'sm_like_song' );
+
+		$this->loader->add_action( 'wp_ajax_nopriv_sm_like_song', $plugin_public, 'sm_like_song' );
 
 	}
 
