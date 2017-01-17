@@ -50,53 +50,7 @@ class Songs_Mania_Admin {
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-
-	}
-
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Songs_Mania_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Songs_Mania_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/songs-mania-admin.css', array(), $this->version, 'all' );
-
-	}
-
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Songs_Mania_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Songs_Mania_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/songs-mania-admin.js', array( 'jquery' ), $this->version, false );
+		$this->version     = $version;
 
 	}
 
@@ -131,18 +85,18 @@ class Songs_Mania_Admin {
 	/**
 	 * Register `Song Manager` role
 	 *
-	 * @link https://developer.wordpress.org/reference/functions/register_post_type/
+	 * @link    https://vip.wordpress.com/functions/wpcom_vip_add_role/
 	 *
 	 * @since    1.0.0
 	 */
 	public function register_role() {
 
 		wpcom_vip_add_role( 'song_manager', 'Song Manager', array(
-			'read' => true,
-			'edit_posts' => true,
-			'edit_others_posts' => true,
+			'read'                 => true,
+			'edit_posts'           => true,
+			'edit_others_posts'    => true,
 			'edit_published_posts' => true,
-			'read_private_posts' => true,
+			'read_private_posts'   => true,
 		) );
 	}
 
@@ -160,19 +114,13 @@ class Songs_Mania_Admin {
 	/**
 	 * Renders the meta box.
 	 *
-	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
+	 * It is callback function of register_meta_boxes()
 	 *
 	 * @since    1.0.0
 	 */
 	function render_metabox() {
-		global $post;
-
-		// Noncename needed to verify where the data originated.
+		// Nonce name needed to verify where the data originated.
 		wp_nonce_field( 'sm_song_action', 'sm_nonce' );
-		$singer = get_post_meta( $post->ID, 'sm_song_singer', true );
-		$singer_email = get_post_meta( $post->ID, 'sm_song_singer_email', true );
-		$likes = get_post_meta( $post->ID, 'sm_song_likes', true );
-		$viewers = get_post_meta( $post->ID, 'sm_song_viewer', true );
 
 		require_once( plugin_dir_path( __FILE__ ) . '/templates/songs-meta-fields.php' );
 	}
@@ -180,21 +128,28 @@ class Songs_Mania_Admin {
 	/**
 	 * Handles saving the meta box.
 	 *
-	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
-	 *
 	 * @since    1.0.0
 	 *
 	 * @param int $post_id Post ID.
 	 * @return null
 	 */
 	public function save_meta( $post_id ) {
+		// Check if not an autosave request.
+		if ( wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
+
+		// Check if not a revision.
+		if ( wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
 		// Add nonce for security and authentication.
-		$sm_nonce = filter_input( INPUT_POST, 'sm_nonce', FILTER_SANITIZE_STRING );
-		$nonce_name = isset( $sm_nonce ) ? $sm_nonce : '';
+		$nonce_name   = filter_input( INPUT_POST, 'sm_nonce', FILTER_SANITIZE_STRING );
 		$nonce_action = 'sm_song_action';
 
 		// Check if nonce is set.
-		if ( ! isset( $nonce_name ) ) {
+		if ( isset( $nonce_name ) ) {
 
 			// Check if nonce is valid.
 			if ( ! wp_verify_nonce( $nonce_name, $nonce_action ) ) {
@@ -207,14 +162,6 @@ class Songs_Mania_Admin {
 			}
 
 			// Check if not an autosave.
-			return;
-		}
-		if ( wp_is_post_autosave( $post_id ) ) {
-			return;
-		}
-
-		// Check if not a revision.
-		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
 

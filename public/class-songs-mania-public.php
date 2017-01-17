@@ -55,46 +55,13 @@ class Songs_Mania_Public {
 	}
 
 	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Songs_Mania_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Songs_Mania_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/songs-mania-public.css', array(), $this->version, 'all' );
-
-	}
-
-	/**
 	 * Register the JavaScript for the public-facing side of the site.
 	 *
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Songs_Mania_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Songs_Mania_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		// Add plugin js with wp-util dependency.
 		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/songs-mania-public.js', array( 'wp-util' ), $this->version, true );
 
 		wp_localize_script( $this->plugin_name, 'smSongLikeNonce', wp_create_nonce( 'sm-song-likes-great' ) );
@@ -109,7 +76,6 @@ class Songs_Mania_Public {
 	 * @link    https://10up.github.io/Engineering-Best-Practices/php/
 	 *
 	 * @since   1.0.0
-	 *
 	 * @param   int $post_id Post ID.
 	 */
 	public function refresh_songs_cache( $post_id ) {
@@ -123,6 +89,7 @@ class Songs_Mania_Public {
 	 * Retrieve latest 4 songs and cache the results.
 	 *
 	 * @link    https://10up.github.io/Engineering-Best-Practices/php/
+	 *          https://developer.wordpress.org/reference/functions/wp_cache_get/
 	 *
 	 * @since   1.0.0
 	 *
@@ -158,7 +125,7 @@ class Songs_Mania_Public {
 	}
 
 	/**
-	 * Display songs when shortcode is added to any post or page.
+	 * Display songs when '[sm_display_songs]' shortcode is added to any post or page.
 	 *
 	 * @since 1.0.0
 	 *
@@ -187,7 +154,11 @@ class Songs_Mania_Public {
 	/**
 	 * Increasing song likes count for particular song.
 	 *
-	 * @since 1.0.0
+	 * @link    http://php.net/manual/en/function.filter-input.php
+	 *          https://developer.wordpress.org/reference/functions/wp_send_json_success/
+	 *          https://developer.wordpress.org/reference/functions/wp_send_json_error/
+	 *
+	 * @since   1.0.0
 	 */
 	public function sm_like_song() {
 		// Check if nonce is set.

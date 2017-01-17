@@ -17,6 +17,13 @@
  * @subpackage Songs_Mania/admin/templates
  */
 
+global $post;
+
+$singer = get_post_meta( $post->ID, 'sm_song_singer', true );
+$singer_email = get_post_meta( $post->ID, 'sm_song_singer_email', true );
+$likes = get_post_meta( $post->ID, 'sm_song_likes', true );
+$viewers = get_post_meta( $post->ID, 'sm_song_viewer', true );
+
 ?>
 
 <table>

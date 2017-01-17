@@ -1,6 +1,7 @@
 (function( $, wp ) {
     'use strict';
 
+    // Nonce
     var nonce = smSongLikeNonce;
 
     window.songsObj = {
@@ -33,6 +34,7 @@
         },
     };
 
+    // Like button call event.
     $( '.sm-like' ).on( 'click', function () {
         var postId = $( this ).data( "id" );
         songsObj.likeSong( postId );

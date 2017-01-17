@@ -119,7 +119,7 @@ class Songs_Mania_Loader {
 	}
 
 	/**
-	 * Add a new filter to the collection to be registered with WordPress.
+	 * Add a new shortcode to the collection to be registered with WordPress.
 	 *
 	 * @since    1.0.0
 	 * @param    string $hook             The name of the shortcode that is being registered.
@@ -131,7 +131,7 @@ class Songs_Mania_Loader {
 	}
 
 	/**
-	 * A utility function that is used to register the actions and hooks into a single
+	 * A utility function that is used to register the shortcode hooks into a single
 	 * collection.
 	 *
 	 * @since    1.0.0
@@ -158,7 +158,7 @@ class Songs_Mania_Loader {
 	}
 
 	/**
-	 * Register the filters and actions with WordPress.
+	 * Register the filters, actions and shortcodes with WordPress.
 	 *
 	 * @since    1.0.0
 	 */
