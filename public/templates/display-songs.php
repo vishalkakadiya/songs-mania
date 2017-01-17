@@ -4,9 +4,7 @@
  * User: vishalkakadiya
  * Date: 14/01/17
  * Time: 11:24 PM
- */
 
-/**
  * Template for the displaying post list.
  *
  * Template variables and inclusion available at plugin/class-songs-mania-public.php

@@ -4,9 +4,7 @@
  * User: vishalkakadiya
  * Date: 14/01/17
  * Time: 3:49 PM
- */
 
-/**
  * Template contains meta fields for song post type.
  *
  * Template variables and inclusion available at admin/class-songs-mania-admin.php

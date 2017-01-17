@@ -13,8 +13,8 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
+ * Defines the plugin name, version, and hooks which is
+ * used in public area.
  *
  * @package    Songs_Mania
  * @subpackage Songs_Mania/public
