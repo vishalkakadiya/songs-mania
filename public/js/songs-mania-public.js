@@ -1,15 +1,12 @@
 (function( $, wp ) {
     'use strict';
 
-    // Nonce
-    var nonce = smSongLikeNonce;
-
     window.songsObj = {
 
         // function when like button clicked
         likeSong: function ( postId ) {
             var params = {
-                sm_nonce: smSongLikeNonce,
+                sm_nonce: smSongLikeNonce[0],
                 post_id: postId
             };
 

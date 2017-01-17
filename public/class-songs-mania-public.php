@@ -64,7 +64,7 @@ class Songs_Mania_Public {
 		// Add plugin js with wp-util dependency.
 		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/songs-mania-public.js', array( 'wp-util' ), $this->version, true );
 
-		wp_localize_script( $this->plugin_name, 'smSongLikeNonce', wp_create_nonce( 'sm-song-likes-great' ) );
+		wp_localize_script( $this->plugin_name, 'smSongLikeNonce', array( wp_create_nonce( 'sm-song-likes-great' ) ) );
 
 		wp_enqueue_script( $this->plugin_name );
 
