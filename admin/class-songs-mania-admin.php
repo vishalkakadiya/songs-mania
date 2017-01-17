@@ -101,7 +101,7 @@ class Songs_Mania_Admin {
 	}
 
 	/**
-	 * Add
+	 * Registering metaboxes for `song` posts.
 	 *
 	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
 	 *
