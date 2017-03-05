@@ -7,12 +7,12 @@
 /**
  * The path to the WordPress tests checkout.
  */
-define( 'WP_TESTS_DIR', '/Users/vishalkakadiya/Documents/WordPress/unit-tests/trunk/tests/phpunit/' );
+define( 'WP_TESTS_DIR', dirname( __FILE__ ) . '/tests/phpunit/' );
 
 /**
  * The path to the main file of the plugin to test.
  */
-define( 'TEST_PLUGIN_FILE', '/Users/vishalkakadiya/Documents/WordPress/unit-tests/trunk/src/songs-mania/songs-mania.php' );
+define( 'TEST_PLUGIN_FILE', dirname( __FILE__ ) . '/src/songs-mania.php' );
 
 /**
  * The WordPress tests functions.
