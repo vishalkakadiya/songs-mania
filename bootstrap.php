@@ -1,49 +1,23 @@
 <?php
-
 /**
- * Set up environment for my plugin's tests suite.
- */
-
-/**
- * The path to the WordPress tests checkout.
- */
-define( 'WP_TESTS_DIR', chdir( dirname( __FILE__ ) . '/tests/phpunit/' ) );
-
-/**
- * The path to the main file of the plugin to test.
- */
-define( 'TEST_PLUGIN_FILE', chdir( dirname( __FILE__ ) . '/src/songs-mania.php' ) );
-
-/**
- * The WordPress tests functions.
+ * Bootstrap the plugin unit testing environment. Customize 'active_plugins'
+ * setting below to point to your main plugin file.
  *
- * We are loading this so that we can add our testsc filter
- * to load the plugin, using tests_add_filter().
- */
-require_once WP_TESTS_DIR . 'includes/functions.php';
-
-/**
- * Manually load the plugin main file.
+ * Requires WordPress Unit Tests (http://unit-test.svn.wordpress.org/trunk/).
  *
- * The plugin won't be activated within the test WP environment,
- * that's why we need to load it manually.
- *
- * You will also need to perform any installation necessary after
- * loading your plugin, since it won't be installed.
+ * @package wordpress-plugin-tests
  */
-function _manually_load_plugin() {
-
-	require TEST_PLUGIN_FILE;
-
-	// Make sure plugin is installed here ...
+// Add this plugin to WordPress for activation so it can be tested.
+$GLOBALS['wp_tests_options'] = array(
+	'active_plugins' => array( 'songs-mania/songs-mania.php' ),
+);
+// If the wordpress-tests repo location has been customized (and specified
+// with WP_TESTS_DIR), use that location. This will most commonly be the case
+// when configured for use with Travis CI.
+// Otherwise, we'll just assume that this plugin is installed in the WordPress
+// SVN external checkout configured in the wordpress-tests repo.
+if ( false !== getenv( 'WP_TESTS_DIR' ) ) {
+	require getenv( 'WP_TESTS_DIR' ) . '/includes/bootstrap.php';
+} else {
+	require dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) . '/includes/bootstrap.php';
 }
-tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
-
-/**
- * Sets up the WordPress test environment.
- *
- * We've got our action set up, so we can load this now,
- * and viola, the tests begin.
- */
-require WP_TESTS_DIR . 'includes/bootstrap.php';
-
