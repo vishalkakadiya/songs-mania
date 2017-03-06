@@ -3,11 +3,6 @@
  * Installs WordPress for running the tests and loads WordPress and the test libraries
  */
 
-echo ' P : <pre>';
-print_r( dirname( dirname( __FILE__ ) ) );
-echo '</pre>';
-die;
-
 
 $config_file_path = dirname( dirname( __FILE__ ) );
 if ( ! file_exists( $config_file_path . '/wp-tests-config.php' ) ) {
