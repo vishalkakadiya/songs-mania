@@ -70,27 +70,27 @@ class MyPlugin_Test_Example extends WP_UnitTestCase {
 	}
 
 
-	public function test_adds_query_var_if_public() {
-		$this->set_permalink_structure( '/%postname%' );
-
-		/* @var WP $wp */
-		global $wp;
-
-		$post_type_object = new WP_Post_Type( $this->post_type, array(
-			'public'    => true,
-			'rewrite'   => false,
-			'query_var' => 'listen',
-		) );
-
-		$post_type_object->add_rewrite_rules();
-		$in_array = in_array( 'listen', $wp->public_query_vars, true );
-
-		$post_type_object->remove_rewrite_rules();
-		$in_array_after = in_array( 'listen', $wp->public_query_vars, true );
-
-		$this->assertTrue( $in_array );
-		$this->assertFalse( $in_array_after );
-	}
+//	public function test_adds_query_var_if_public() {
+////		$this->set_permalink_structure( '/%postname%' );
+//
+//		/* @var WP $wp */
+//		global $wp;
+//
+//		$post_type_object = new WP_Post_Type( $this->post_type, array(
+//			'public'    => true,
+//			'rewrite'   => false,
+//			'query_var' => 'listen',
+//		) );
+//
+//		$post_type_object->add_rewrite_rules();
+//		$in_array = in_array( 'listen', $wp->public_query_vars, true );
+//
+//		$post_type_object->remove_rewrite_rules();
+//		$in_array_after = in_array( 'listen', $wp->public_query_vars, true );
+//
+//		$this->assertTrue( $in_array );
+//		$this->assertFalse( $in_array_after );
+//	}
 
 
 	public function test_register_meta_boxes() {
