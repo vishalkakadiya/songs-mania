@@ -9,7 +9,7 @@ notifications:
 
 branches:
   only:
-    - master
+    - unit-tests
 
 # list any PHP version you want to test against
 php:
