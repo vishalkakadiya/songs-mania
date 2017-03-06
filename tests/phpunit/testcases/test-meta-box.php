@@ -23,6 +23,14 @@ class Tests_Meta_Box extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
+	public function test_add_meta_box() {
+		global $wp_meta_boxes;
+
+		add_meta_box( 'sm-song-meta', 'Song\'s Detail', '__return_false', $this->post_type, 'normal', 'default' );
+
+		$this->assertArrayHasKey( 'sm-song-meta', $wp_meta_boxes[ $this->post_type ]['normal']['default'] );
+	}
+
 	public function test_remove_meta_box() {
 		global $wp_meta_boxes;
 
