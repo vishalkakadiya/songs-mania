@@ -26,8 +26,6 @@ env:
 
 # Grab the setup script and execute
 before_script:
-    - curl http://pear.php.net/go-pear.phar > go-pear.php
-    - echo | php -q go-pear.php
     - wget https://raw.github.com/tierra/wordpress-plugin-tests/setup/setup.sh
     - source setup.sh
 
