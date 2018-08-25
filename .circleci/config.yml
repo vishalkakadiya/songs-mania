@@ -1,5 +1,17 @@
-version: 2
-jobs:
-  build:
-    docker: # See https://docs.docker.com/get-started/#docker-concepts if you are new to Docker.
-      - image: circleci/php:7.2
+machine:
+  php:
+    version: 7.2
+  environment:
+    WP_CORE_DIR: /tmp/wordpress/
+    PATH: $HOME/.composer/vendor/bin:$PATH
+
+dependencies:
+  pre:
+    - sudo apt-get update
+
+test:
+  pre:
+    - |
+      composer install
+  override:
+    - phpcs --standard=phpcs.ruleset.xml $(find . -name '*.php')
