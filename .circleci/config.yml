@@ -22,7 +22,6 @@ references:
       - WP_HOST: *WP_HOST
       - WP_ORG_PLUGIN_NAME: *WP_ORG_PLUGIN_NAME
       - WP_ORG_USERNAME: *WP_ORG_USERNAME
-    working_directory: ~/passwords-evolved
 
   workspace_root: &workspace_root
     /tmp
