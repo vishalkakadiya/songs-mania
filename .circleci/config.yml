@@ -22,6 +22,7 @@ references:
       - WP_HOST: *WP_HOST
       - WP_ORG_PLUGIN_NAME: *WP_ORG_PLUGIN_NAME
       - WP_ORG_USERNAME: *WP_ORG_USERNAME
+    working_directory: ~/passwords-evolved
 
   workspace_root: &workspace_root
     /tmp
@@ -178,58 +179,3 @@ jobs:
           name: Deploy new version to WordPress plugin directory
           command: .circleci/deploy-plugin.sh
 
-workflows:
-  version: 2
-  build_test_deploy:
-    jobs:
-      - build
-      - deploy_assets:
-          filters:
-            branches:
-              only:
-                - master
-      - code_quality:
-          requires:
-            - build
-      - test_php72:
-          requires:
-            - code_quality
-      - test_php71:
-          requires:
-            - code_quality
-      - test_php70:
-          requires:
-            - code_quality
-      - test_php56:
-          requires:
-            - code_quality
-      - test_php55:
-          requires:
-            - code_quality
-      - test_php54:
-          requires:
-            - code_quality
-      - acceptance_singlesite:
-          requires:
-            - test_php72
-            - test_php71
-            - test_php70
-            - test_php56
-            - test_php55
-            - test_php54
-      - acceptance_multisite:
-          requires:
-            - test_php72
-            - test_php71
-            - test_php70
-            - test_php56
-            - test_php55
-            - test_php54
-      - deploy_plugin:
-          filters:
-            branches:
-              only:
-                - master
-          requires:
-            - acceptance_singlesite
-            - acceptance_multisite
