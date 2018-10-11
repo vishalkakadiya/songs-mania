@@ -1,164 +1,239 @@
-# Bedrock infused WordPress config file for Circle CI 2.0
+version: 2.0
 
-version: 2
-jobs:
-  build:
-    working_directory: ~/repo
+references:
+  # Environment variables
+  #
+  WP_CORE_DIR: &WP_CORE_DIR
+    /tmp/wordpress
+  WP_HOST: &WP_HOST
+    passwords-evolved.test
+  WP_ORG_PLUGIN_NAME: &WP_ORG_PLUGIN_NAME
+    passwords-evolved
+  WP_ORG_USERNAME: &WP_ORG_USERNAME
+    carlalexander
+
+  # Default container configuration
+  #
+  container_config: &container_config
     docker:
-      # specify the version you desire here
-      # - image: circleci/php:7.0-fpm-node-browsers
-      - image: k1sul1/circleci-wordpress:0.0.1
-        environment:
-          - WP_TEST_URL: "http://localhost:12000"
-          - WP_TEST_USER: "test"
-          - WP_TEST_USER_PASS: "test"
-          - WP_ENV: "ci"
-          - MYSQL_ALLOW_EMPTY_PASSWORD: true,
-          - MYSQL_DATABASE: "circle_test"
-          - MYSQL_HOST: "127.0.0.1"
-          - DB_HOST: "127.0.0.1"
-          - DB_USER: "root"
-          - DB_PASSWORD: ""
-          - DB_NAME: "circle_test"
+      - image: circleci/php:7.2
+    environment:
+      - WP_CORE_DIR: *WP_CORE_DIR
+      - WP_HOST: *WP_HOST
+      - WP_ORG_PLUGIN_NAME: *WP_ORG_PLUGIN_NAME
+      - WP_ORG_USERNAME: *WP_ORG_USERNAME
+    working_directory: ~/passwords-evolved
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: circleci/mysql:5.7.22-ram
+  workspace_root: &workspace_root
+    /tmp
 
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+
+  copy_vendor: &copy_vendor
+    run:
+      name: Copy vendor directory
+      command: cp -R /tmp/vendor .
+
+  install_subversion: &install_subversion
+    run:
+      name: Install subversion
+      command: sudo apt-get install subversion
+
+  # Default configuration for all behat testing jobs
+  #
+  behat_job: &behat_job
+    <<: *container_config
+    docker:
+      - image: circleci/php:7.2
+      - image: circleci/mysql:5.7
     steps:
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "composer.json" }}
-          - v1-dependencies-{{ checksum "htdocs/wp-content/themes/wordpress-theme-base/package.json" }}
-
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
       - run:
-          name: Preparations
-          command: |
-            # sudo apt-get install pv mysql-client sshpass
-            # sudo docker-php-ext-install mysqli pdo pdo_mysql # WTF, why aren't these installed already?
-            composer install -n --prefer-dist --no-dev
-
+          name: Add WordPress host to hosts file
+          command: echo "127.0.0.1 ${WP_HOST}" | sudo tee -a /etc/hosts
+      - *attach_workspace
+      - *copy_vendor
       - run:
-          name: Build frontend
-          command: |
-            cd htdocs/wp-content/themes/wordpress-theme-base
-            npm install # Builds using prod conf
+          name: Install MySQL client
+          command: sudo apt-get install mysql-client
+      - run:
+          name: Install MySQL PHP extension
+          command: sudo docker-php-ext-install mysqli
+      - run:
+          name: Setup WordPress
+          command: .circleci/setup-$WP_TYPE.sh
+      - run:
+          name: Start PHP server
+          command: sudo php -S $WP_HOST:80 -t $WP_CORE_DIR
+          background: True
+      - run:
+          name: Run Behat tests
+          command: vendor/bin/behat --config .circleci/behat.yml --format progress --tags=$WP_TYPE
 
+  # Default configuration for all phpunit testing jobs
+  #
+  phpunit_job: &phpunit_job
+    <<: *container_config
+    steps:
+      - checkout
+      - *attach_workspace
+      - *copy_vendor
+      - run:
+          name: Run PHP unit tests
+          command: vendor/bin/phpunit
+
+jobs:
+  build:
+    <<: *container_config
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: composer install -n -o
       - run:
           name: Install WordPress
-          command: |
-            # set +eo pipefail
-            # set -x
+          command: bash .circleci/install-wp.sh
+      - persist_to_workspace:
+          root: .
+          paths:
+            - vendor
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - wordpress
 
-            # Get WP-cli
-            curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-
-            # Install WordPress
-            php wp-cli.phar core install \
-              --url=$WP_TEST_URL \
-              --title='Test' \
-              --admin_user=$WP_TEST_USER \
-              --admin_password=$WP_TEST_USER_PASS \
-              --admin_email="$WP_TEST_USER@wordpress.dev" \
-              --path=htdocs/wordpress
-
-            # Get the database
-            sshpass -e ssh -q -o StrictHostKeyChecking=no circleci@wordpress.vincit.io -p 22 'wp db export - --single-transaction' > database.sql
-            mysql -h 127.0.0.1 -u root -D circle_test < database.sql
-            rm database.sql
-
-            # Activate all plugins
-            php wp-cli.phar plugin activate --all --path=htdocs/wordpress
-
-            # Get alternative router so we can do without Apache or nginx
-            cd ~/repo
-            curl -s https://raw.githubusercontent.com/Seravo/wordpress-test-template/master/lib/router.php > htdocs/router.php
-            cd htdocs
-            ls
-
-            php -S 0.0.0.0:8080 router.php &
-            sleep 2; # This randomly fixed issue with not being able to connect
-            curl -i http://localhost:8080
-
+  code_quality:
+    <<: *container_config
+    steps:
+      - checkout
+      - *attach_workspace
+      - *copy_vendor
       - run:
-          name: Deploy
-          command: |
-            # Handle restarting nginx and so on...
-            if [ $CIRCLE_BRANCH == 'master' ]; then
-              sshpass -e rsync -av --progress \
-              --omit-dir-times \
-              --no-perms \
-              --exclude='node_modules' \
-              --delete \
-              -e 'ssh -T -o Compression=no -o StrictHostKeyChecking=no -p 22' \
-              ~/repo/htdocs/wp-content/themes/ circleci@wordpress.vincit.io:/var/www/html/htdocs/wp-content/themes
+          name: Run code quality tests
+          command: vendor/bin/grumphp run --testsuite=code_quality
 
-              sshpass -e rsync -av --progress \
-              --omit-dir-times \
-              --no-perms \
-              --exclude='node_modules' \
-              --delete \
-              -e 'ssh -T -o Compression=no -o StrictHostKeyChecking=no -p 22' \
-              ~/repo/htdocs/wp-content/plugins/ circleci@wordpress.vincit.io:/var/www/html/htdocs/wp-content/plugins
+  test_php72:
+    <<: *phpunit_job
+    docker:
+      - image: circleci/php:7.2
 
-              sshpass -e rsync -av --progress \
-              --omit-dir-times \
-              --no-perms \
-              --exclude='node_modules' \
-              --delete \
-              -e 'ssh -T -o Compression=no -o StrictHostKeyChecking=no -p 22' \
-              ~/repo/htdocs/wp-content/mu-plugins/ circleci@wordpress.vincit.io:/var/www/html/htdocs/wp-content/mu-plugins
-            fi
+  test_php71:
+    <<: *phpunit_job
+    docker:
+      - image: circleci/php:7.1
 
-      # - run: # Say no to ruby, try Puppeteer
-          # name: RSpec
-          # command: |
-            # bundle install --gemfile=~/repo/tests/rspec/Gemfile
-            # cd ~/repo/tests/rspec
-            # bundle exec rspec *.rb
+  test_php70:
+    <<: *phpunit_job
+    docker:
+      - image: circleci/php:7.0
 
+  test_php56:
+    <<: *phpunit_job
+    docker:
+      - image: circleci/php:5.6
 
-      - save_cache:
-          key: v1-dependencies-{{ checksum "composer.json" }}
-          paths:
-            - ./vendor
+  test_php55:
+    <<: *phpunit_job
+    docker:
+      - image: vandries/phpenv:5.5
 
-      - save_cache:
-          key: v1-dependencies-{{ checksum "htdocs/wp-content/themes/wordpress-theme-base/package.json" }}
-          paths:
-            - /home/circleci/repo/htdocs/wp-content/themes/wordpress-theme-base/node_modules
+  test_php54:
+    <<: *phpunit_job
+    docker:
+      - image: vandries/phpenv:5.4
 
-  # What's the point of running a separate job for this? Deploy will fail if the build fails.
-  # This is just much slower. So let's not use it, for now.
+  acceptance_singlesite:
+    <<: *behat_job
+    environment:
+      - WP_CORE_DIR: *WP_CORE_DIR
+      - WP_HOST: *WP_HOST
+      - WP_ORG_PLUGIN_NAME: *WP_ORG_PLUGIN_NAME
+      - WP_ORG_USERNAME: *WP_ORG_USERNAME
+      - WP_TYPE: singlesite
 
-  # deploy:
-    # working_directory: ~/repo
-    # docker:
-      # - image: circleci/php:7.0-fpm-node-browsers
-      # - image: circleci/mysql:latest
+  acceptance_multisite:
+    <<: *behat_job
+    environment:
+      - WP_CORE_DIR: *WP_CORE_DIR
+      - WP_HOST: *WP_HOST
+      - WP_ORG_PLUGIN_NAME: *WP_ORG_PLUGIN_NAME
+      - WP_ORG_USERNAME: *WP_ORG_USERNAME
+      - WP_TYPE: multisite
 
-    # steps:
-      # - run:
-          # name: Deploy to staging
-          # command: |
-            # sudo apt-get install sshpass
-            # sshpass -e scp -r -P 10349 USER@TARGET.domain:/data/wordpress ~/repo
+  deploy_assets:
+    <<: *container_config
+    steps:
+      - checkout
+      - *attach_workspace
+      - *install_subversion
+      - run:
+          name: Deploy assets to WordPress plugin directory
+          command: .circleci/deploy-assets.sh
+
+  deploy_plugin:
+    <<: *container_config
+    steps:
+      - checkout
+      - *attach_workspace
+      - *install_subversion
+      - run:
+          name: Deploy new version to WordPress plugin directory
+          command: .circleci/deploy-plugin.sh
 
 workflows:
   version: 2
-  build-deploy:
+  build_test_deploy:
     jobs:
       - build
-      # - deploy:
-          # requires:
-            # - build
-          # filters:
-            # branches:
-              # only: master
+      - deploy_assets:
+          filters:
+            branches:
+              only:
+                - master
+      - code_quality:
+          requires:
+            - build
+      - test_php72:
+          requires:
+            - code_quality
+      - test_php71:
+          requires:
+            - code_quality
+      - test_php70:
+          requires:
+            - code_quality
+      - test_php56:
+          requires:
+            - code_quality
+      - test_php55:
+          requires:
+            - code_quality
+      - test_php54:
+          requires:
+            - code_quality
+      - acceptance_singlesite:
+          requires:
+            - test_php72
+            - test_php71
+            - test_php70
+            - test_php56
+            - test_php55
+            - test_php54
+      - acceptance_multisite:
+          requires:
+            - test_php72
+            - test_php71
+            - test_php70
+            - test_php56
+            - test_php55
+            - test_php54
+      - deploy_plugin:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - acceptance_singlesite
+            - acceptance_multisite
