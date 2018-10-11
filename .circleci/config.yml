@@ -162,26 +162,6 @@ jobs:
       - WP_ORG_USERNAME: *WP_ORG_USERNAME
       - WP_TYPE: multisite
 
-  deploy_assets:
-    <<: *container_config
-    steps:
-      - checkout
-      - *attach_workspace
-      - *install_subversion
-      - run:
-          name: Deploy assets to WordPress plugin directory
-          command: .circleci/deploy-assets.sh
-
-  deploy_plugin:
-    <<: *container_config
-    steps:
-      - checkout
-      - *attach_workspace
-      - *install_subversion
-      - run:
-          name: Deploy new version to WordPress plugin directory
-          command: .circleci/deploy-plugin.sh
-
 workflows:
   version: 2
   build_test_deploy:
@@ -229,11 +209,3 @@ workflows:
             - test_php56
             - test_php55
             - test_php54
-      - deploy_plugin:
-          filters:
-            branches:
-              only:
-                - master
-          requires:
-            - acceptance_singlesite
-            - acceptance_multisite
